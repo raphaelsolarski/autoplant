@@ -42,6 +42,7 @@ class CyclicSchedule(models.Model):
     water_unit = models.ForeignKey(WaterUnit, on_delete=models.DO_NOTHING, max_length=40, verbose_name=_('Water unit'))
     time = models.TimeField(verbose_name=_('Time'))
     water_amount = models.IntegerField(verbose_name=_('Water amount'))
+    active = models.BooleanField(verbose_name=_('Active'), default=True)
 
     def __str__(self):
         return 'Water unit: {} at: {} Amount: {} ml'.format(self.water_unit, self.time, self.water_amount)
@@ -53,16 +54,14 @@ class CyclicSchedule(models.Model):
 
 class ScheduledWatering(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Creation date'))
-    scheduled_watering_date = models.DateTimeField(verbose_name=_('Scheduled watering date'))
     watering_performed_date = models.DateTimeField(null=True, verbose_name=_('Watering performed date'))
-    cyclicSchedule = models.ForeignKey(CyclicSchedule, on_delete=models.DO_NOTHING, null=True,
-                                       verbose_name=_('Cyclic Schedule'))
+    cyclic_schedule = models.ForeignKey(CyclicSchedule, on_delete=models.DO_NOTHING, null=True,
+                                        verbose_name=_('Cyclic Schedule'))
 
     def __str__(self):
-        return '{} {} {} {}'.format(self.scheduling_date,
-                                    self.scheduled_watering_date,
-                                    self.watering_performed_date,
-                                    self.cyclicSchedule)
+        return '{} {} {}'.format(self.creation_date,
+                                 self.watering_performed_date,
+                                 self.cyclic_schedule)
 
     class Meta:
         verbose_name = _('Scheduled watering')
