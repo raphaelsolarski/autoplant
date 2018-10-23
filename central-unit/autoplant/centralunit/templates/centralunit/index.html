@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+</head>
+<body>
+<canvas id="temperatureChart" width="400" height="100"></canvas>
+<canvas id="humidityChart" width="400" height="100"></canvas>
+<script>
+    var ctx1 = document.getElementById("temperatureChart").getContext('2d');
+    var ctx2 = document.getElementById("humidityChart").getContext('2d');
+
+    var pall = palette('tol', 4).map(function (hex) {
+            return '#' + hex;
+        }
+    );
+
+    fetch("http://localhost:8000/central-unit/temperature")
+        .then((r) => r.json())
+        .then(function (data) {
+            let newJson = data.map(function (e) {
+                return {t: moment(e.time).valueOf(), y: e.value};
+            });
+            new Chart(ctx1, {
+                type: 'line',
+                labels: [],
+                data: {
+                    datasets: [{
+                        label: 'rasb0',
+                        data: newJson,
+                        fill: false,
+                        borderColor: pall[0]
+                    }]
+                },
+                options: {
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            distribution: 'series',
+                            ticks: {
+                                source: 'data',
+                                callback: function(value, index, values) {
+                                    if (index % 20 === 0) {
+                                        return moment(values[index].value).format();
+                                    } else {
+                                        return '';
+                                    }
+                                }
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }],
+                        yAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Temperature (C)'
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+
+    var humidityChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'rasb0',
+                data: [{
+                    x: 10,
+                    y: 20
+                }, {
+                    x: 15,
+                    y: 10
+                }],
+                fill: false,
+                borderColor: pall[0]
+            }, {
+                label: 'rasb1',
+                data: [{
+                    x: 15,
+                    y: 10
+                }, {
+                    x: 15,
+                    y: 30
+                }],
+                fill: false,
+                borderColor: pall[1]
+            }, {
+                label: 'rasb2',
+                data: [{
+                    x: 15,
+                    y: 10
+                }, {
+                    x: 15,
+                    y: 25
+                }],
+                fill: false,
+                borderColor: pall[2]
+            }, {
+                label: 'rasb3',
+                data: [{
+                    x: 15,
+                    y: 0
+                }, {
+                    x: 15,
+                    y: 30
+                }],
+                fill: false,
+                borderColor: pall[3]
+            }],
+        },
+        options: {}
+    });
+</script>
+</body>
+</html>
