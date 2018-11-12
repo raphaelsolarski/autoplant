@@ -1,0 +1,7 @@
+all:
+  children:
+    central-unit-server:
+      hosts:
+        pi:
+          apps_dir: /opt
+          installation_dir: "{{ apps_dir }}/central-unit"

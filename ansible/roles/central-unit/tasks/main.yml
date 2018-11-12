@@ -1,0 +1,31 @@
+- name: Create temp dir on local host
+  local_action:
+    module: tempfile
+    state: directory
+    suffix: foo-build
+  register: tmp_dir
+  become: false
+
+- name: Archive and copy files to temp dir
+  local_action:
+    module: archive
+    path: "../central-unit/autoplant"
+    dest: "{{ tmp_dir.path }}/central-unit.tgz"
+  become: false
+
+- name: remove current installation directory
+  file:
+    path: "{{ installation_dir }}"
+    state: absent
+
+- name: Copy and extract package to host
+  unarchive:
+    src: "{{ tmp_dir.path }}/central-unit.tgz"
+    dest: "{{ apps_dir }}"
+
+- name: delete local tmp dir
+  local_action:
+    module: file
+    state: absent
+    path: "{{ tmp_dir.path }}"
+  become: false

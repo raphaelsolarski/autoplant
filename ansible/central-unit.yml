@@ -1,0 +1,6 @@
+- hosts: central-unit-server
+  become: yes
+  become_method: sudo
+  become_user: root
+  roles:
+  - central-unit

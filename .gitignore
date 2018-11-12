@@ -2,3 +2,4 @@
 *.sqlite3
 *.iml
 *__pycache__*
+*.retry
